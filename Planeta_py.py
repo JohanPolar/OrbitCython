@@ -15,7 +15,7 @@ class Planet(object):
 
 def single_step(planet, dt):
     '''
-    Un solo paso
+        Un solo paso
     '''
 
     #Calcular fuerza: gravedad al origen
@@ -36,7 +36,7 @@ def single_step(planet, dt):
 
 def step_time(planet, time_span, n_steps):
     '''
-    Muchos pasos
+        Muchos pasos
     '''
     dt = time_span / n_steps
     for j in range(n_steps):

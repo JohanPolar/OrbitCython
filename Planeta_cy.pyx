@@ -1,7 +1,17 @@
-from math import sqrt
+#cython: language_level=3
+cimport cython
 
-class Planet(object):
+'''
+    Se instancia como función externa,
+    Se prepara para multihilo
+'''
 
+cdef extern from "math.h":
+    float sqrt(float x) nogil
+
+cdef class Planet(object):
+#Variables publicas : declaración
+    cdef public float x,y,z,vx,vy,vz,m
     def __init__(self):
         #Posicion y velocidad (3D)
         self.x = 1.0
@@ -14,7 +24,13 @@ class Planet(object):
         #Masa
         self.m = 1.0
 
-def single_step(planet, dt):
+"""
+    Puede ser la distancia 0?
+    No, Preparamos una alerta basada en Cython: cdivión (True/False)
+"""
+
+@cython.cdivision(True)
+cdef void single_step(Planet planet, double dt) nogil:
     '''Dar un paso'''
 
     #Calcular fuerza: gravedad al origen
@@ -33,10 +49,14 @@ def single_step(planet, dt):
     planet.vy += dt * Fy / planet.m
     planet.vz += dt * Fz / planet.m
  
-def step_time(planet, time_span, n_steps):
+def step_time(Planet planet, double time_span, int n_steps):
     '''Dar n cantidad de pasos'''
     cdef double dt = time_span / n_steps
     cdef int j
-    for j in range(n_steps):
-        single_step(planet, dt)
+    """
+    Se prepara para paralelismo
+    """
 
+    with nogil:
+        for j in range(n_steps):
+            single_step(planet, dt)
